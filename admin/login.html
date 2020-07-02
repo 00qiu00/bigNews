@@ -48,7 +48,7 @@
           <h4 class="modal-title">温馨提示</h4>
         </div>
         <div class="modal-body">
-          <p>One fine body&hellip;</p>
+          <p>!!!!!!</p>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
@@ -75,7 +75,8 @@
         //1.4 进行非空判断
         if (username == '' || password == '') {
           // alert('账号或密码不能为空!')
-          $('#myModal').modal();
+          $('#myModal .modal-body>p').text('账号或密码不能为空!')
+          $('#myModal').modal(); //bootstrap模态框
           return
         }
 
@@ -94,13 +95,22 @@
               if (backData.code == 200) {
 
                 //1.6 如果账号密码无误,提示登陆成功,跳转到首页
-                alert('登录成功!')
-                window.location.href = './index.html'
+                // alert('登录成功!')
+                $('#myModal .modal-body>p').text('登录成功!')
+                $('#myModal').modal();//bootstrap模态框
+
+                //页面跳转应该在 模态框关闭后(在模态框关闭事件中)
+                $('#myModal').on('hidden.bs.modal', function (e) {
+                  window.location.href = './index.html'
+                })
+
 
               } else {
 
                 //1.7 如果账号密码错误.提示一下
-                alert('登陆失败!')
+                // alert('登陆失败!')
+                $('#myModal .modal-body>p').text('账号或密码有误!')
+                $('#myModal').modal();//bootstrap模态框
               }
             }
           }
