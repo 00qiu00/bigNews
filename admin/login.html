@@ -59,6 +59,9 @@
   </div><!-- /.modal -->
   <!-- bootstrap中的弹出模态框 end-->
 
+
+  <!-- 引入http.js文件 -->
+  <script src="./libs/http.js"></script>
   <script>
     //入口函数
     $(function () {
@@ -84,7 +87,8 @@
         $.ajax(
           {
             type: 'post',
-            url: 'http://localhost:8080/api/v1/admin/user/login',
+            // 引入http.js 中地址
+            url: BigNew.user_login,
             data: {
               username: username,
               password: password
