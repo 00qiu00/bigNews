@@ -105,7 +105,13 @@
             //每次都要引入JQuery,也就是说这个引入的JQuery文件每次都会执行
             //所以这个全局设置写在这个引用的JQuery文件中
 
-
+            $('.logout').on('click', function (e) {
+                e.preventDefault()
+                if (confirm('你确定要退出吗?')) {
+                    localStorage.removeItem('token')
+                    window.location.href = './login.html'
+                }
+            })
         })
     </script>
 </body>
