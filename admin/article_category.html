@@ -43,8 +43,8 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="javascript:void(0)" class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
-                                data-target="#myModal">新增分类</a>
+                            <button class="btn btn-success" id="xinzengfenlei" data-toggle="modal"
+                                data-target="#myModal">新增分类</button>
                         </td>
                     </tr>
                 </tfoot>
@@ -86,24 +86,9 @@
     </div><!-- /.modal -->
 
 
-    <!-- 这是删除按钮的模态框 -->
-    <div class="modal fade" id="delModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">确定要删除吗</h4>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary btn-sure">确定</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+
     <script src="./libs/http.js"></script>
-    <script type="text/data" id="dataXiu">
+    <script type="text/html" id="dataXiu">
         {{each data value}}
             <tr>
                 <td>{{value.name}}</td>
@@ -125,7 +110,7 @@
                         type: 'get',
                         url: BigNew.category_list,
                         success: function (res) {
-                            console.log(res)
+                            // console.log(res)
                             if (res.code == 200) {
                                 var htmlStr = template('dataXiu', res)
                                 $('tbody').html(htmlStr)
@@ -135,13 +120,60 @@
                 )
             }
 
+            //模态框修改
+            $('#myModal').on('show.bs.modal', function (e) {
+                console.log(e.relatedTarget)
+                if (e.relatedTarget == $('#xinzengfenlei')[0]) {
+                    $(".modal-title").text('新增文章分类')
+                    $('.btn-primary').text('新增').addClass('btn-success').removeClass('btn-info')
+                } else {
+                    $(".modal-title").text('编辑文章分类')
+                    $('.btn-primary').text('编辑').addClass('btn-info').removeClass('btn-success')
+                }
+            })
 
-            // 修改按钮
-            // $('tbody').on('click', '.btn-info', function () {
 
-            //     console.log(123)
+            // 判断按钮 是新增/编辑
+            $('.btn-primary').on('click', function () {
+                if ($(this).hasClass('btn-success')) {
+                    // alert(1)
+                    //新增
+                    var xzname = $('#exampleInputEmail1').val().trim()
 
-            // })
+                    var xzslug = $('#exampleInputPassword1').val().trim()
+
+                    $.ajax(
+                        {
+                            type: 'post',
+                            url: BigNew.category_add,
+                            data: {
+                                name: xzname,
+                                slug: xzslug
+                            },
+                            beforeSend: function () {
+                                if (xzname == '' || xzslug == '') {
+                                    alert('输入框不能为空')
+                                    return false
+                                }
+                            },
+                            success: function (res) {
+                                console.log(res)
+                                if (res.code == 201) {
+                                    alert('新增成功')
+                                    reader()
+                                    $('#myModal').modal('hide')
+                                    $('#exampleInputEmail1').val('')
+                                    $('#exampleInputPassword1').val('')
+                                }
+                            }
+                        }
+                    )
+
+                } else if ($(this).hasClass('btn-info')) {
+                    // alert(2)
+
+                }
+            })
         })
     </script>
 </body>
