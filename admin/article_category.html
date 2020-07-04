@@ -122,8 +122,8 @@
 
             //模态框修改
             $('#myModal').on('show.bs.modal', function (e) {
-                // $('#exampleInputEmail1').val('')
-                // $('#exampleInputPassword1').val('')
+                $('#exampleInputEmail1').val('')
+                $('#exampleInputPassword1').val('')
                 console.log(e.relatedTarget)
                 if (e.relatedTarget == $('#xinzengfenlei')[0]) {
                     $(".modal-title").text('新增文章分类')
