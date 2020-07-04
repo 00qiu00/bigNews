@@ -64,7 +64,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="myForm">
-                        <input type="hidden" name="id">
+                        <input type="hidden" name="id" id="cateId">
                         <div class="form-group">
                             <label for="exampleInputEmail1">文章分类名称</label>
                             <input type="text" name="name" class="form-control" id="exampleInputEmail1"
@@ -122,6 +122,8 @@
 
             //模态框修改
             $('#myModal').on('show.bs.modal', function (e) {
+                $('#exampleInputEmail1').val('')
+                $('#exampleInputPassword1').val('')
                 console.log(e.relatedTarget)
                 if (e.relatedTarget == $('#xinzengfenlei')[0]) {
                     $(".modal-title").text('新增文章分类')
@@ -129,19 +131,33 @@
                 } else {
                     $(".modal-title").text('编辑文章分类')
                     $('.btn-primary').text('编辑').addClass('btn-info').removeClass('btn-success')
+
+                    //编辑的第一步
+                    //把信息显示在 模态框中
+
+                    $('#exampleInputEmail1').val($(e.relatedTarget).parent().prev().prev().text().trim())
+                    $('#exampleInputPassword1').val($(e.relatedTarget).parent().prev().text().trim())
+                    $('#cateId').val($(e.relatedTarget).data('id'))
                 }
+
             })
 
 
             // 判断按钮 是新增/编辑
             $('.btn-primary').on('click', function () {
+
+
                 if ($(this).hasClass('btn-success')) {
+                    console.log('新增')
+
+                    var xzname = $('#exampleInputEmail1').val().trim()
+                    var xzslug = $('#exampleInputPassword1').val().trim()
+                    if (xzname == '' || xzslug == '') {
+                        alert('输入框不能为空')
+                        return
+                    }
                     // alert(1)
                     //新增
-                    var xzname = $('#exampleInputEmail1').val().trim()
-
-                    var xzslug = $('#exampleInputPassword1').val().trim()
-
                     $.ajax(
                         {
                             type: 'post',
@@ -150,12 +166,12 @@
                                 name: xzname,
                                 slug: xzslug
                             },
-                            beforeSend: function () {
-                                if (xzname == '' || xzslug == '') {
-                                    alert('输入框不能为空')
-                                    return false
-                                }
-                            },
+                            // beforeSend:{
+                            //     f(xzname == '' || xzslug == '') {
+                            //     alert('输入框不能为空')
+                            //     return
+                            // }
+                            // },
                             success: function (res) {
                                 console.log(res)
                                 if (res.code == 201) {
@@ -170,8 +186,34 @@
                     )
 
                 } else if ($(this).hasClass('btn-info')) {
+                    console.log('编辑')
+                    var xzname = $('#exampleInputEmail1').val().trim()
+                    var xzslug = $('#exampleInputPassword1').val().trim()
+                    var id = $('#cateId').val()
+                    console.log(id)
                     // alert(2)
+                    $.ajax(
+                        {
+                            type: 'post',
+                            url: BigNew.category_edit,
+                            data: {
+                                id: id,
+                                name: xzname,
+                                slug: xzslug
+                            },
+                            success: function (res) {
+                                console.log(res)
 
+                                if (res.code == 200) {
+                                    alert('修改成功！')
+                                    reader()
+                                    $('#myModal').modal('hide')
+                                    $('#exampleInputEmail1').val('')
+                                    $('#exampleInputPassword1').val('')
+                                }
+                            }
+                        }
+                    )
                 }
             })
         })
