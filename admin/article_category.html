@@ -124,7 +124,7 @@
             $('#myModal').on('show.bs.modal', function (e) {
                 $('#exampleInputEmail1').val('')
                 $('#exampleInputPassword1').val('')
-                console.log(e.relatedTarget)
+                // console.log(e.relatedTarget)
                 if (e.relatedTarget == $('#xinzengfenlei')[0]) {
                     $(".modal-title").text('新增文章分类')
                     $('.btn-primary').text('新增').addClass('btn-success').removeClass('btn-info')
@@ -148,7 +148,7 @@
 
 
                 if ($(this).hasClass('btn-success')) {
-                    console.log('新增')
+                    // console.log('新增')
 
                     var xzname = $('#exampleInputEmail1').val().trim()
                     var xzslug = $('#exampleInputPassword1').val().trim()
@@ -173,7 +173,7 @@
                             // }
                             // },
                             success: function (res) {
-                                console.log(res)
+                                // console.log(res)
                                 if (res.code == 201) {
                                     alert('新增成功')
                                     reader()
@@ -186,7 +186,7 @@
                     )
 
                 } else if ($(this).hasClass('btn-info')) {
-                    console.log('编辑')
+                    // console.log('编辑')
                     var xzname = $('#exampleInputEmail1').val().trim()
                     var xzslug = $('#exampleInputPassword1').val().trim()
                     var id = $('#cateId').val()
@@ -202,7 +202,7 @@
                                 slug: xzslug
                             },
                             success: function (res) {
-                                console.log(res)
+                                // console.log(res)
 
                                 if (res.code == 200) {
                                     alert('修改成功！')
