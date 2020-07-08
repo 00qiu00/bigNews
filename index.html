@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/font-awesome.min.css">
     <link rel="stylesheet" href="css/main.css">
+    <!-- <script src="./js/jquery-1.12.4.min.js"></script> -->
 </head>
 
 <body>
@@ -227,6 +228,151 @@
     <script src="./js/template-web.js"></script>
     <!-- 引入jq文件 -->
     <script src="./js/jquery-1.12.4.min.js"></script>
+    <!-- 分页插件 -->
+    <script src="./js/jquery.pagination.min.js"></script>
+    <!-- 接口文件 -->
+    <script src="./js/http.js"></script>
+    <!-- 分类模板 -->
+    <script type="text/template" id='categorylist'>
+        {{each data v index}}
+            <li><a href="./list.html?id={{v.id}}">{{v.name}}</a></li>
+        {{/each}}
+    </script>
+    <!-- 图片模板 -->
+    <script type="text/template" id='hotpiclist'>
+        {{each data v index}}
+            {{if index== 0}}
+                <li class="first">
+            {{else}}
+                <li>
+            {{/if}}
+                    <a href="./article.html?id={{v.id}}"><img src="{{v.cover}}" alt=""></a>
+                    <p>{{v.title}}</p>
+                </li>
+        {{/each}}
+    </script>
+    <!-- 一周热门排行 -->
+    <script type="text/template" id='hotranklist'>
+        {{each data v index}}
+                <li><span>{{index+1}}</span><a href="./article.html?id={{v.id}}">{{v.title}}</a></li>
+        {{/each}}
+    </script>
+    <!-- 焦点关注 -->
+    <script type="text/template" id='guanzhulist'>
+        {{each data v index}}
+                <li><a href="./article.html?id={{v.id}}">{{v.intro}}</a></li>
+        {{/each}}
+    </script>
+    <!-- 最新评论 -->
+    <script type="text/template" id='latestcomment'>
+        {{each data v index}}
+                <li>
+                    <span>{{v.author.slice(0,1)}}</span>
+                    <b><em>{{v.author}}</em> {{v.date}}({{v.time}})说:</b>
+                    <strong>{{v.intro}}</strong>
+                </li>
+        {{/each}}
+    </script>
+    <!-- 最新资讯 -->
+    <script type="text/template" id='commonnews'>
+        {{each data v index}}
+                <div class="common_news_list">
+                    <a href="./article.html?id={{v.id}}" class="list_pic"><img src="{{v.cover}}" alt=""></a>
+                    <h4><a href="./article.html?id={{v.id}}">{{v.title}}</a></h4>
+                    <p>{{@v.content}}</p>
+                    <div class="new_info">
+                        <span>标签：{{v.category}}&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+                            <i class="fa fa-eye"></i>&nbsp;阅读({{v.read}})&nbsp;&nbsp;&nbsp;<i class="fa fa-commenting"></i>&nbsp;评论({{v.comments}})
+                        </span>
+                        <b>发布于 {{v.date}} 12:18:58</b>
+                    </div>
+                </div>
+        {{/each}}
+    </script>
+    <script>
+        $(function () {
+            //文章类型
+            $.ajax(
+                {
+                    type: 'get',
+                    url: BigNew.category_list,
+                    success: function (res) {
+                        // console.log(res)
+                        if (res.code == 200) {
+                            var htmlStr = template('categorylist', res)
+                            $(".level_two").html('<li class="up"></li>' + htmlStr)
+                            $(".left_menu").html(htmlStr)
+                        }
+                    }
+                }
+            )
+            //图片
+            $.ajax(
+                {
+                    type: 'get',
+                    url: BigNew.hotPic_news,
+                    success: function (res) {
+                        // console.log(res)
+                        if (res.code == 200) {
+                            var htmlStr = template('hotpiclist', res)
+                            $(".focus_list").html(htmlStr)
+                        }
+                    }
+                }
+            )
+
+            //一周热门排行
+            $.ajax(
+                {
+                    type: 'get',
+                    url: BigNew.hotrank_list,
+                    success: function (res) {
+                        var htmlStr = template('hotranklist', res)
+                        $(".hotrank_list").html(htmlStr)
+
+                        $(".hotrank_list>li>span").eq(0).addClass('first')
+                        $(".hotrank_list>li>span").eq(1).addClass('second')
+                        $(".hotrank_list>li>span").eq(2).addClass('third')
+                    }
+                }
+            )
+            //焦点关注
+            $.ajax(
+                {
+                    type: 'get',
+                    url: BigNew.attention_news,
+                    success: function (res) {
+                        var htmlStr = template('guanzhulist', res)
+                        $(".guanzhu_list").html(htmlStr)
+                    }
+                }
+            )
+            //最新评论
+            $.ajax(
+                {
+                    type: 'get',
+                    url: BigNew.latest_comment,
+                    success: function (res) {
+                        // console.log(res)
+                        var htmlStr = template('latestcomment', res)
+                        $(".comment_list").html(htmlStr)
+                    }
+                }
+            )
+            //最新资讯
+            $.ajax(
+                {
+                    type: 'get',
+                    url: BigNew.latest_news,
+                    success: function (res) {
+                        console.log(res)
+                        var htmlStr = template('commonnews', res)
+                        $(".common_news").html(htmlStr)
+                    }
+                }
+            )
+        })
+    </script>
 </body>
 
 </html>
