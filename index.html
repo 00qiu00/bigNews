@@ -371,6 +371,17 @@
                     }
                 }
             )
+            //搜索 
+            $('.search_btn').on('click', function (e) {
+                e.preventDefault()
+                var str = $('.search_txt').val().trim()
+                console.log(str)
+                if (str !== '') {
+                    window.location.href = `./list.html?search=${str}`
+                } else {
+                    alert('不能为空')
+                }
+            })
         })
     </script>
 </body>
