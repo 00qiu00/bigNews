@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="css/main.css">
   <script src="./libs/jquery-1.12.4.min.js"></script>
   <script src="./libs/template-web.js"></script>
+  <!-- 分页插件 -->
+  <script src="./libs/jquery.twbsPagination.js"></script>
 </head>
 
 <body>
@@ -23,6 +25,7 @@
       <table class="table table-striped table-bordered table-hover mp20">
         <thead>
           <tr>
+            <th>序号</th>
             <th>作者</th>
             <th>评论</th>
             <th>评论在</th>
@@ -31,7 +34,7 @@
             <th class="text-center" width="100">操作</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="tbodys">
           <tr>
             <td>小周</td>
             <td>这是一条测试评论，欢迎光临</td>
@@ -142,24 +145,186 @@
         </tbody>
       </table>
       <div class="row text-center">
-        <ul class="pagination pagination-sm">
-          <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
-          <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
-          <li class="page-item active"><a href="#" class="page-link">1</a></li>
-          <li class="page-item"><a href="#" class="page-link">2</a></li>
-          <li class="page-item"><a href="#" class="page-link">3</a></li>
-          <li class="page-item"><a href="#" class="page-link">4</a></li>
-          <li class="page-item"><a href="#" class="page-link">5</a></li>
-          <li class="page-item"><a href="#" class="page-link">6</a></li>
-          <li class="page-item"><a href="#" class="page-link">7</a></li>
-          <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
-          <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
-        </ul>
-        <ul id="pagination" class="pagination-sm"></ul>
+        <ul id="pagination-demo" class="pagination-sm"></ul>
+        <p id="pagination">暂时没有数据</p>
       </div>
 
     </div>
   </div>
+  <script src="./libs/http.js"></script>
+  <script type="text/html" id='commentlist'>
+    {{each data v index}}
+        {{if v.state=="待审核"}}
+            <tr class="danger">
+        {{else}}
+            <tr>
+        {{/if}}
+                <td class='text-center'>{{index+1}}</td>
+                <td>{{v.author}}</td>
+                <td>{{v.content}}</td>
+                <td>{{v.title}}</td>
+                <td>2017-07-04 {{v.time}}</td>
+                <td>{{v.state}}</td>
+                <td class="text-center">
+                  {{if v.state=="已通过"}}
+                  <button data-id={{v.id}} class="btn btn-warning btn-xs">拒绝</button> 
+                  <button data-id={{v.id}} class="btn btn-danger btn-xs">删除</button>  
+                  {{else if v.state=="待审核"}}
+                  <button data-id={{v.id}} class="btn btn-info btn-xs">批准</button> 
+                  <button data-id={{v.id}} class="btn btn-danger btn-xs">删除</button>  
+                  {{else}}
+                  <button data-id={{v.id}} class="btn btn-danger btn-xs">删除</button>  
+                  {{/if}}
+                </td>
+            </tr>
+    {{/each}}
+  </script>
+  <script>
+    $(function () {
+      //定义分页插件函数
+      var currentPage = 1
+      function fenye(res, visiblePages) {
+        $('#pagination-demo').twbsPagination({
+          totalPages: res.data.totalPage,
+          visiblePages: visiblePages || 7, // 可见最大上限页码值
+          first: '首页',
+          last: '最后一页',
+          next: '下一页',
+          prev: '上一页',
+          initiateStartPageClick: false, // 不要默认点击 
+          onPageClick: function (event, page) {
+            //  console.log(event,page);
+            // page是当前页码
+            currentPage = page //chun'bian'liang
+            $.ajax(
+              {
+                type: 'get',
+                url: BigNew.comment_list,
+                data: {
+                  page: page,
+                  perpage: 10
+                },
+                success: function (res) {
+                  // console.log(res.data)
+                  if (res.code == 200) {
+                    var htmlSrc = template('commentlist', res.data)
+                    $('#tbodys').html(htmlSrc)
+                    if (res.data.totalCount == 0) {
+                      $('#pagination-demo').hide().next().show()
+                    } else {
+                      $('#pagination-demo').show().next().hide()
+                      //调用 分页函数
+                      fenye(res)
+                    }
+                  }
+                }
+              }
+            )
+          }
+        })
+      }
+      //定义分页插件函数 end
+
+      //显示评论
+      function reser() {
+        $.ajax(
+          {
+            type: 'get',
+            url: BigNew.comment_list,
+            data: {
+              perpage: 10
+            },
+            success: function (res) {
+              // console.log(res.data)
+              if (res.code == 200) {
+                var htmlSrc = template('commentlist', res.data)
+                $('#tbodys').html(htmlSrc)
+                if (res.data.totalCount == 0) {
+                  $('#pagination-demo').hide().next().show()
+                } else {
+                  $('#pagination-demo').show().next().hide()
+                  //调用 分页函数
+                  fenye(res)
+                }
+              }
+            }
+          }
+        )
+      }
+      reser()
+      //显示评论  end
+
+
+      $('#tbodys').on('click', '.btn', function (e) {
+        //评论 id
+        var id = $(this).data(id).id
+
+        if ($(this).hasClass('btn-info')) {
+
+          // 批准评论
+          $.ajax(
+            {
+              type: 'post',
+              url: BigNew.comment_pass,
+              data: {
+                id: id
+              },
+              success: function (res) {
+
+                // console.log(res)
+                if (res.code == 200) {
+                  alert(res.msg)
+                  reser()
+                }
+              }
+            }
+          )
+        } else if ($(this).hasClass('btn-warning')) {
+
+          // 拒绝评论
+          $.ajax(
+            {
+              type: 'post',
+              url: BigNew.comment_reject,
+              data: {
+                id: id
+              },
+              success: function (res) {
+                // console.log(res)
+                if (res.code == 200) {
+                  alert(res.msg)
+                  reser()
+                }
+              }
+            }
+          )
+        } else {
+
+          // 删除评论
+          $.ajax(
+            {
+              type: 'post',
+              url: BigNew.comment_delete,
+              data: {
+                id: id
+              },
+              success: function (res) {
+                // console.log(res)
+                if (res.code == 200) {
+                  alert(res.msg)
+                  reser()
+                }
+              }
+            }
+          )
+        }
+      })
+
+
+
+
+    })
+  </script>
 </body>
 
 </html>
